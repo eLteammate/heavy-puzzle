@@ -1,0 +1,10 @@
+do_reset = true
+
+[cors]
+website_url = "*"
+
+[image]
+filename = "image.jpg"
+rows = 6
+columns = 8
+scale = 2

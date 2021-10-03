@@ -1,0 +1,16 @@
+bidict==0.21.3
+dnspython==1.16.0
+dynaconf==3.1.7
+eventlet==0.30.2
+greenlet==1.1.2
+gunicorn==20.1.0
+Mako==1.1.5
+MarkupSafe==2.0.1
+pathlib==1.0.1
+Pillow==8.3.2
+python-engineio==4.2.1
+python-socketio==5.4.0
+six==1.16.0
+SQLAlchemy==1.4.25
+zope.event==4.5.0
+zope.interface==5.4.0

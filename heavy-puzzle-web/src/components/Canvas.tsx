@@ -1,9 +1,11 @@
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Center} from "@chakra-ui/react";
 import {useGesture} from "@use-gesture/react";
 import {useAppSelector} from "../store/store";
 import {selectPuzzle} from "../store/puzzleSlice";
 import PuzzleBlock from "./PuzzleBlock";
+import {motion} from "framer-motion";
+import DragHandler from "./DragHandler";
 
 
 const clamp = (x: any, min: any, max: any) => {
@@ -59,11 +61,14 @@ const limitTransition = (transition: CanvasTransition, container: HTMLDivElement
 };
 
 
+export const CanvasCoordinatesContext = React.createContext(1);
+
+
 export default function Canvas() {
     const puzzle = useAppSelector(selectPuzzle);
 
     const container = useRef<HTMLDivElement>(null);
-    const canvas = useRef<SVGSVGElement>(null);
+    const canvasHandlerElement = useRef<SVGRectElement>(null);
 
     const [transition, setTransition] = useState<CanvasTransition>({
         offsetX: 0,
@@ -86,6 +91,8 @@ export default function Canvas() {
             );
             setTransition(limited);
         },
+        // onDragStart: () => dispatch(userSlice.actions.setMovesPuzzle("canvas")),
+        // onDragEnd: () => dispatch(userSlice.actions.setMovesPuzzle(undefined)),
         onPinch: (e) => {
             setTransition(limitTransition(
                 {
@@ -96,20 +103,42 @@ export default function Canvas() {
             ));
             e.offset[0] = clamp(e.offset[0], 1, 5);
         },
-    }, {target: canvas});
+    }, {
+        target: canvasHandlerElement,
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => setTransition(limitTransition(transition, container.current!!)), []);
 
     return (
-        <Center overflow="hidden" h="100vh" ref={container}>
-            <svg
-                ref={canvas}
-                viewBox={`${transition.offsetX} ${transition.offsetY} ${transition.width} ${transition.height}`}
-                style={{touchAction: "none"}}
-            >
-                {puzzle?.map(block => <PuzzleBlock block={block} key={block.id}/>)}
-            </svg>
-        </Center>
+        <CanvasCoordinatesContext.Provider value={transition.trueScale || 1}>
+            <Center overflow="hidden" h="100vh" ref={container}>
+                <motion.svg
+                    animate={{
+                        viewBox: `
+                        ${transition.offsetX.toFixed(2)} 
+                        ${transition.offsetY.toFixed(2)} 
+                        ${transition.width} ${transition.height}
+                        `,
+                    }}
+                    style={{touchAction: "none"}}
+                >
+                    <rect
+                        ref={canvasHandlerElement}
+                        width={1000} height={1000} fill="white"
+                        style={{touchAction: "none"}}
+                    />
+                    {[...(puzzle || [])].sort(
+                        (p1, p2) => (p2.weight - p1.weight)
+                    ).map(block => <PuzzleBlock
+                        block={block}
+                        key={block.id}
+                    />)}
+                    {puzzle?.map(block => (
+                        <DragHandler block={block} key={block.id}/>
+                    ))}
+                </motion.svg>
+            </Center>
+        </CanvasCoordinatesContext.Provider>
     );
 }

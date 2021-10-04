@@ -7,4 +7,4 @@ website_url = "*"
 filename = "image.jpg"
 rows = 6
 columns = 8
-scale = 2
+scale = 1

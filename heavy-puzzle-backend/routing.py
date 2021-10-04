@@ -14,17 +14,22 @@ def drag(sid, data):
         block_id=data["blockId"], expires=datetime.now() + timedelta(seconds=10)))
     block: PuzzleBlock = session.query(PuzzleBlock).filter(PuzzleBlock.id == data["blockId"]).one()
     k = len(block.dragging_users)
-    if k >= block.weight:
-        x = sum(d.x for d in block.dragging_users) / k
-        y = sum(d.y for d in block.dragging_users) / k
-        offset_x = x - block.center_x
-        offset_y = y - block.center_y
-        for piece in block.pieces:
-            piece.x += offset_x
-            piece.y += offset_y
-        k = len(block.pieces)
-        block.center_x = sum(p.x for p in block.pieces) / k + block.pieces[0].width / 2
-        block.center_y = sum(p.y for p in block.pieces) / k + block.pieces[0].height / 2
+
+    x = sum(d.x for d in block.dragging_users) / k
+    y = sum(d.y for d in block.dragging_users) / k
+    offset_x = x - block.center_x
+    offset_y = y - block.center_y
+
+    if k < block.weight:
+        offset_x /= 3000 * block.weight
+        offset_y /= 3000 * block.weight
+
+    for piece in block.pieces:
+        piece.x += offset_x
+        piece.y += offset_y
+    k = len(block.pieces)
+    block.center_x = sum(p.x for p in block.pieces) / k + block.pieces[0].width / 2
+    block.center_y = sum(p.y for p in block.pieces) / k + block.pieces[0].height / 2
 
     session.add_all((block, *block.pieces))
     session.commit()

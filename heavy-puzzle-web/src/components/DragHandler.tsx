@@ -1,6 +1,7 @@
 import {PuzzleBlockObject} from "../logic/objects";
 import {motion} from "framer-motion";
 import React from "react";
+import {useDragBlock} from "./PuzzleBlock";
 
 
 interface DragHandlerProps {
@@ -9,7 +10,9 @@ interface DragHandlerProps {
 
 
 export default function DragHandler({block}: DragHandlerProps) {
-    const color = `hsl(${(block.id * 1337) % 360} 100% 50%)`
+    const groupRef = useDragBlock(block);
+
+    const color = `hsl(${(block.id * 1337) % 360} 100% 50%)`;
 
     return (
         <motion.g
@@ -17,6 +20,7 @@ export default function DragHandler({block}: DragHandlerProps) {
             animate={{opacity: block.draggingUsers.length > 0 ? 1 : 0}}
             transition={{duration: 0.15}}
             key={block.id}
+            ref={groupRef}
         >
             {
                 block.draggingUsers.map(drag => <React.Fragment key={drag.id}>

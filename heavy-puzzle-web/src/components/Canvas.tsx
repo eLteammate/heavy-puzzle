@@ -34,7 +34,7 @@ interface CanvasTransition {
 const limitTransition = (transition: CanvasTransition, container: HTMLDivElement): CanvasTransition => {
     const rect = container.getBoundingClientRect();
 
-    const scale = clamp(transition.scale, 1, 5);
+    const scale = transition.scale;
     const trueScale = Math.max(rect.width, rect.height) / canvasUnscaledSize * scale;
     const size = canvasUnscaledSize / scale;
 
@@ -97,14 +97,16 @@ export default function Canvas() {
             setTransition(limitTransition(
                 {
                     ...transition,
-                    scale: Math.abs(e.offset[0]),
+                    scale: e.offset[0],
                 },
                 container.current!!,
             ));
-            e.offset[0] = clamp(e.offset[0], 1, 5);
         },
     }, {
         target: canvasHandlerElement,
+        pinch: {
+            scaleBounds: [1, 5],
+        },
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

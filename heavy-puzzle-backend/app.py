@@ -7,7 +7,7 @@ from config import settings
 
 socket_io = socketio.Server(
     cors_allowed_origins=settings.cors.website_url,
-    logger=True,
+    # logger=True,
 )
 
 app = socketio.WSGIApp(

@@ -12,7 +12,7 @@ interface PuzzleBlockProps {
 }
 
 
-export default function PuzzleBlock({block}: PuzzleBlockProps) {
+export function useDragBlock(block: PuzzleBlockObject) {
     const groupRef = useRef<SVGGElement>(null);
     const scale = useContext(CanvasCoordinatesContext);
 
@@ -27,6 +27,13 @@ export default function PuzzleBlock({block}: PuzzleBlockProps) {
             bounds: {top: 50, bottom: 950, left: 50, right: 950},
         },
     });
+
+    return groupRef;
+}
+
+
+export default function PuzzleBlock({block}: PuzzleBlockProps) {
+    const groupRef = useDragBlock(block);
 
     return (
         <motion.g ref={groupRef} style={{touchAction: "none"}}>

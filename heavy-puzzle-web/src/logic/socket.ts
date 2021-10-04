@@ -5,14 +5,16 @@ import {puzzleSlice} from "../store/puzzleSlice";
 
 
 const socket = io(process.env.REACT_APP_API_URL as string);
+console.log(process.env.REACT_APP_API_URL);
 
 
 socket.on("connect", () => {
-
+    console.log("connected");
 });
 
 
 socket.on("state", data => {
+    console.log(data);
     const blocks = data.blocks as PuzzleBlockObject[];
     store.dispatch(puzzleSlice.actions.set(blocks));
 });

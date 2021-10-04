@@ -37,8 +37,21 @@ export default function PuzzleBlock({block}: PuzzleBlockProps) {
 
     return (
         <motion.g ref={groupRef} style={{touchAction: "none"}}>
+            {block.pieces.map(piece => <motion.rect
+                animate={{
+                    x: piece.x,
+                    y: piece.y,
+                }}
+                width={piece.width * 1.03}
+                height={piece.height * 1.03}
+                stroke="white"
+                strokeWidth={2}
+                transition={{duration: 0.5}}
+                key={-block.id}
+            />)}
+
             {[...block.pieces].sort(
-                (p1, p2) => (p1.id - p2.id)
+                (p1, p2) => (p1.id - p2.id),
             ).map(piece =>
                 <PuzzlePiece
                     selected={true}

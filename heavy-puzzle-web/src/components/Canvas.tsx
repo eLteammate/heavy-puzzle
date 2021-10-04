@@ -127,15 +127,17 @@ export default function Canvas() {
                 >
                     <rect
                         ref={canvasHandlerElement}
-                        width={1000} height={1000} fill="white"
+                        width={1000} height={1000} fill="#181818"
                         style={{touchAction: "none"}}
                     />
                     {[...(puzzle || [])].sort(
-                        (p1, p2) => (p2.weight - p1.weight)
-                    ).map(block => <PuzzleBlock
-                        block={block}
-                        key={block.id}
-                    />)}
+                        (p1, p2) => (p2.weight - p1.weight),
+                    ).map(block => (
+                        <PuzzleBlock
+                            block={block}
+                            key={block.id}
+                        />
+                    ))}
                     {puzzle?.map(block => (
                         <DragHandler block={block} key={block.id}/>
                     ))}

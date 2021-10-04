@@ -47,7 +47,7 @@ export default function PuzzleBlock({block}: PuzzleBlockProps) {
                 stroke="white"
                 strokeWidth={2}
                 transition={{duration: 0.5}}
-                key={-block.id}
+                key={-piece.id}
             />)}
 
             {[...block.pieces].sort(

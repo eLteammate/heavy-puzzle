@@ -5,6 +5,7 @@ from sqlalchemy import or_
 
 from app import socket_io, session
 from models import DraggingUser, PuzzleBlock
+from reset import reset_all
 
 
 @socket_io.event
@@ -71,7 +72,7 @@ def try_merge(b1: PuzzleBlock, b2: PuzzleBlock):
             elif delta_x == 0 and delta_y == -1:
                 y2 += p2.height
 
-            if abs(x1 - x2) + abs(y1 - y2) < 6:
+            if abs(x1 - x2) + abs(y1 - y2) < 100000:
                 offset_x = p1.x - p1.grid_position_x * p1.width
                 offset_y = p1.y - p1.grid_position_y * p1.height
                 for p in b2.pieces:
@@ -98,15 +99,30 @@ def try_merge(b1: PuzzleBlock, b2: PuzzleBlock):
     return False
 
 
+requires_shuffle = True
+
+
 def get_state():
+    global requires_shuffle
+
     session.query(DraggingUser).filter(datetime.now() > DraggingUser.expires).delete()
     blocks: list[PuzzleBlock] = session.query(PuzzleBlock).all()
 
     b1: PuzzleBlock
     b2: PuzzleBlock
     for b1, b2 in itertools.combinations(blocks, 2):
+        requires_shuffle = True
         if try_merge(b1, b2):
             blocks.remove(b2)
+            break
+
+    if len(blocks) == 1 and requires_shuffle:
+        def reset_later():
+            socket_io.sleep(3)
+            reset_all()
+
+        socket_io.start_background_task(reset_later)
+        requires_shuffle = False
 
     return {
         "blocks": [block.to_json() for block in blocks]

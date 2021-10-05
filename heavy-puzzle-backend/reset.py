@@ -9,14 +9,20 @@ from app import session
 from config import settings
 
 
+image_id = uuid.uuid4()
+
+
 def reset_all():
     static_files_dir = Path("./static")
-    image_id = uuid.uuid4()
-    (static_files_dir / image_id.hex).mkdir()
+    try:
+        (static_files_dir / image_id.hex).mkdir()
+    except FileExistsError:
+        pass
 
     session.query(models.PuzzlePiece).delete()
     session.query(models.PuzzleBlock).delete()
     session.query(models.DraggingUser).delete()
+    session.commit()
 
     with Image.open(static_files_dir / settings.image.filename) as image:
         width, height = image.size
@@ -40,8 +46,8 @@ def reset_all():
                 name = image_id.hex + f"/{y // row_size}-{x // column_size}.jpg"
                 piece.save(static_files_dir / name)
 
-                canvas_x = 250 + positions[i][0] * piece_width
-                canvas_y = 250 + positions[i][1] * piece_height
+                canvas_x = 30 + positions[i][0] * piece_width
+                canvas_y = 30 + positions[i][1] * piece_height
                 i += 1
                 block_object = models.PuzzleBlock(
                     center_x=(canvas_x + piece_width / 2),
